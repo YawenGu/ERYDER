@@ -1,4 +1,4 @@
-public class Feedback {
+public class feedback {
    
     private String firstName;
     private String lastName;
@@ -8,7 +8,7 @@ public class Feedback {
     private boolean longFeedback;
 
    
-    public Feedback(String firstName, String lastName, String email) {
+    public feedback(String firstName, String lastName, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -77,7 +77,7 @@ public class Feedback {
         String s4 = "The customer support was helpful and responsive.";
         String s5 = "I would recommend this e-Bike to my friends and family.";
 
-        Feedback feedback = new Feedback("John", "Doe", "john.doe@example.com");
+        feedback feedback = new feedback("John", "Doe", "john.doe@example.com");
         
         feedback.analyseFeedback(false, s1, s2, s3, s4, s5);
        

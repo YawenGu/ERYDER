@@ -1,24 +1,26 @@
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class BikeService {
-    private List<String> availableBikes;
+    private ERyderSystem system;
 
-    public BikeService() {
-        availableBikes = new ArrayList<>();
-        availableBikes.add("B001");
-        availableBikes.add("B002");
-        availableBikes.add("B003");
+    public BikeService(ERyderSystem system) {
+        this.system = system;
     }
 
-    public List<String> getAvailableBikes() {
-        return availableBikes;
+    
+    public void requestBike(String userEmail, String location) {
+        system.addBikeRequest(userEmail, location);
+        System.out.println("Request added to queue.");
     }
 
-    public boolean reserveBike(String bikeId) {
-        return availableBikes.remove(bikeId);
+    
+    public void handleNextRequest() {
+        if (system.isRequestQueueEmpty()) {
+            System.out.println("No pending requests.");
+            return;
+        }
+        BikeRequest req = system.processNextRequest();
+        System.out.println("Processing: " + req);
+        system.addLog("Request processed", req.getUserEmail());
     }
-
-    public void returnBike(String bikeId) {
-        availableBikes.add(bikeId);
-    }
+}

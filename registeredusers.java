@@ -1,5 +1,5 @@
 public class RegisteredUsers {
-    private String name;
+    private String fullName;
     private String emailAddress;
     private String dateOfBirth;
     private String cardNumber;
@@ -15,7 +15,7 @@ public class RegisteredUsers {
                            String cardNumber, String cardProvider,
                            String cardExpiryDate, String cvv,
                            String userType, String[] lastThreeTrips) {
-        this.name = name;
+        this.fullName = name;
         this.emailAddress = emailAddress;
         this.dateOfBirth = dateOfBirth;
         this.cardNumber = cardNumber;
@@ -24,15 +24,18 @@ public class RegisteredUsers {
         this.cvv = cvv;
         this.userType = userType;
         this.lastThreeTrips = lastThreeTrips;
+     }
+   public RegisteredUsers(String fullName, String emailAddress) {
+    this.fullName = fullName;
+    this.emailAddress = emailAddress;
     }
 
-
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.fullName = name;
     }
 
     public String getEmailAddress() {
@@ -97,5 +100,12 @@ public class RegisteredUsers {
 
     public void setLastThreeTrips(String[] lastThreeTrips) {
         this.lastThreeTrips = lastThreeTrips;
+    }
+    public double calculateFare(double baseFare) {
+    return baseFare;
+    }
+
+    public void displayUserType() {
+    System.out.println("Registered User");
     }
 }

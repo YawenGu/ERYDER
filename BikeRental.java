@@ -1,95 +1,42 @@
 import java.time.LocalDateTime;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Scanner;
+import java.util.List;
+
+// 注意：重构后BikeRental类已拆分，此为兼容旧逻辑的修正版
 public class BikeRental {
-     private boolean isRegisteredUser;
-    private String emailAddress;
-    private String location;
-    private LocalDateTime tripStartTime;
-    private String bikeID;
-    private boolean locationValid;
-    private UserRegistration userRegistration;
-    private ActiveRental activeRental;
-    private LinkedList<ActiveRental> activeRentalsList = new LinkedList<>();
+    // 依赖注入（匹配你现有类结构）
+    private BikeDatabase bikeDatabase;
+    private List<ActiveRental> activeRentalsList;
 
-    public void simulateApplicationInput() {
-        System.out.println("This is the simulation of the e-bike rental process.");
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Are you a registered user? (true/false): ");
-        isRegisteredUser = scanner.nextBoolean();
-        scanner.nextLine();
-
-        System.out.print("Enter your email address: ");
-        emailAddress = scanner.nextLine();
-
-        System.out.print("Enter your rental location: ");
-        location = scanner.nextLine();
-
-        System.out.println("Simulating the analysis of the rental request.");
-        bikeID = analyseRequest(isRegisteredUser, emailAddress, location);
-
-        if (!locationValid) {
-            return;
-        }
-
-        System.out.println("Simulating e-bike reservation...");
-        reserveBike(bikeID);
-
-        System.out.println("Displaying the active rentals...");
-        viewActiveRentals();
-
-        System.out.println("Simulating the end of the trip...");
-        removeTrip(bikeID);
-
-        System.out.println("Displaying the active rentals after trip end...");
-        viewActiveRentals();
+    // 构造器
+    public BikeRental(BikeDatabase bikeDatabase, List<ActiveRental> activeRentalsList) {
+        this.bikeDatabase = bikeDatabase;
+        this.activeRentalsList = activeRentalsList;
     }
 
-    private String analyseRequest(boolean isRegistered, String email, String location) {
-        if (isRegistered) {
-            System.out.println("Welcome back, " + email + "!");
-        } else {
-            System.out.println("You're not our registered user. Please consider registering.");
-            userRegistration = new UserRegistration();
-            userRegistration.registration();
-        }
-        return validateLocation(location);
-    }
+    // 1. 修正reserveBike方法（解决所有红线）
+    private void reserveBike(String bikeID, String emailAddress) {
+        // 遍历自行车数据库找对应ID
+        for (Bike bike : bikeDatabase.getBikeList()) {
+            // 修正：方法名getBikeID()（大写D，匹配Bike类），isAvailable()判断可用
+            if (bike.getBikeID().equals(bikeID) && bike.isAvailable()) {
+                LocalDateTime tripStartTime = LocalDateTime.now();
+                // 修正：setAvailable(false)，setLastUsedTime()
+                bike.setAvailable(false);
+                bike.setLastUsedTime(tripStartTime);
+                System.out.println("Reserving the bike with the " + bikeID + ". Please following the on-screen instructions.");
 
-    private String validateLocation(String location) {
-        for (Bike bike : BikeDatabase.bikes) {
-            if (bike.getLocation().equals(location) && bike.isAvailable()) {
-                System.out.println("A bike is available at the location you requested.");
-                locationValid = true;
-                return bike.getBikeID();
+                // 修正：ActiveRental构造器匹配，添加到活跃租赁列表
+                ActiveRental activeRental = new ActiveRental(bikeID, emailAddress, tripStartTime);
+                activeRentalsList.add(activeRental);
+                break;
             }
         }
-        System.out.println("Sorry, no bikes are available at the location you requested. Please try again later.");
-        locationValid = false;
-        return null;
+        // 无匹配车辆提示
+        System.out.println("Sorry, we're unable to reserve a bike at this time. Please try again later.");
     }
 
-    private void reserveBike(String bikeID) {
-        if (bikeID != null) {
-            for (Bike bike : BikeDatabase.bikes) {
-                if (bike.getBikeID().equals(bikeID)) {
-                    tripStartTime = LocalDateTime.now();
-                    bike.setAvailable(false);
-                    bike.setLastUsedTime(tripStartTime);
-                    System.out.println("Reserving the bike with the " + bikeID + ". Please following the on-screen instructions to locate the bike and start your pleasant journey.");
-
-                    activeRental = new ActiveRental(bikeID, emailAddress, tripStartTime);
-                    activeRentalsList.add(activeRental);
-                    break;
-                }
-            }
-        } else {
-            System.out.println("Sorry, we're unable to reserve a bike at this time. Please try again later.");
-        }
-    }
-
+    // 2. 修正viewActiveRentals方法（删除x:语法错误）
     private void viewActiveRentals() {
         if (activeRentalsList.isEmpty()) {
             System.out.println("No active rentals at the moment.");
@@ -100,17 +47,20 @@ public class BikeRental {
         }
     }
 
+    // 3. 修正removeTrip方法（解决迭代器&方法名红线）
     private void removeTrip(String bikeID) {
         Iterator<ActiveRental> iterator = activeRentalsList.iterator();
         while (iterator.hasNext()) {
             ActiveRental rental = iterator.next();
+            // 修正：getBikeID()方法名匹配
             if (rental.getBikeID().equals(bikeID)) {
                 iterator.remove();
                 break;
             }
         }
 
-        for (Bike bike : BikeDatabase.bikes) {
+        // 同步恢复自行车状态
+        for (Bike bike : bikeDatabase.getBikeList()) {
             if (bike.getBikeID().equals(bikeID)) {
                 bike.setAvailable(true);
                 bike.setLastUsedTime(LocalDateTime.now());

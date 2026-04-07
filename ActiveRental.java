@@ -1,27 +1,28 @@
-
-    import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ActiveRental {
-    private String bikeID;
-    private String userEmail;
-    private LocalDateTime tripStartTime;
 
-    public ActiveRental(String bikeID, String userEmail, LocalDateTime tripStartTime) {
-        this.bikeID = bikeID;
-        this.userEmail = userEmail;
-        this.tripStartTime = tripStartTime;
+    private Map<String, String> activeRentals = new HashMap<>();
+    public void addActiveRental(String bikeId, String userId) {
+        activeRentals.put(bikeId, userId);
+    }
+    public void removeActiveRental(String bikeId) {
+        activeRentals.remove(bikeId);
     }
 
-    public String getBikeID() { return bikeID; }
-    public String getUserEmail() { return userEmail; }
-    public LocalDateTime getTripStartTime() { return tripStartTime; }
-
-    @Override
-    public String toString() {
-        return "ActiveRental{" +
-                "bikeID='" + bikeID + '\'' +
-                ", userEmail='" + userEmail + '\'' +
-                ", tripStartTime=" + tripStartTime +
-                '}';
+    public void displayActiveRentals() {
+        System.out.println("=== 当前活跃租赁列表 ===");
+        if (activeRentals.isEmpty()) {
+            System.out.println("暂无活跃租赁");
+        } else {
+            for (Map.Entry<String, String> entry : activeRentals.entrySet()) {
+                System.out.println("自行车ID: " + entry.getKey() + " | 用户ID: " + entry.getValue());
+            }
+        }
+        System.out.println("========================");
+    }
+    public boolean isBikeRented(String bikeId) {
+        return activeRentals.containsKey(bikeId);
     }
 }
